@@ -3,5 +3,6 @@ puts 'Event Manager Initialized!'
 lines = File.readlines('event_attendees.csv')
 lines.each do |line|
   columns = line.split(',')
-  p columns
+  name = columns[2]
+  p name
 end
