@@ -27,6 +27,20 @@ def save_thank_you_letter(id,form_letter)
   end
 end
 
+def clean_phone_number(phone_number)
+  return nil if phone_number.nil?
+
+  trunked_phone_number = phone_number.scan(/[0-9]/).join('')
+  case trunked_phone_number.length
+  when 10
+    trunked_phone_number
+  when 11 && trunked_phone_number[0] == '1'
+    trunked_phone_number[1..]
+  else
+    nil
+  end
+end
+
 def clean_zipcode(zipcode)
   zipcode.to_s.rjust(5, '0')[0..4]
 end
@@ -42,9 +56,11 @@ contents.each do |row|
 
   zipcode = clean_zipcode(row[:zipcode])
 
+  phone_number = clean_phone_number(row[:homephone])
+
   legislator_names = legislators_by_zipcode(zipcode)
 
   form_letter = erb_template.result(binding)
 
-  save_thank_you_letter(id,form_letter)
+  save_thank_you_letter(id, form_letter)
 end
