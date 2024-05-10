@@ -24,6 +24,7 @@ end
 
 puts 'Event Manager Initialized!'
 
+template_letter = File.read('form_letter.html')
 contents = CSV.open('event_attendees.csv', headers: true, header_converters: :symbol)
 contents.each do |row|
   name = row[:first_name]
@@ -32,5 +33,8 @@ contents.each do |row|
 
   legislator_names = legislators_by_zipcode(zipcode)
 
-  puts "#{name} #{zipcode} #{legislator_names}"
+  personal_letter = template_letter.gsub('FIRST_NAME', name)
+  personal_letter.gsub!('LEGISLATORS', legislator_names)
+
+  puts personal_letter
 end
