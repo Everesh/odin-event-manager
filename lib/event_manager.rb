@@ -45,6 +45,8 @@ def clean_zipcode(zipcode)
   zipcode.to_s.rjust(5, '0')[0..4]
 end
 
+reg_time = []
+
 puts 'Event Manager Initialized!'
 
 template_letter = File.read('form_letter.erb')
@@ -58,9 +60,18 @@ contents.each do |row|
 
   phone_number = clean_phone_number(row[:homephone])
 
+  reg_time.push(Time.strptime(row[:regdate], '%m/%d/%y %H:%M').hour) unless row[:regdate].nil?
+
   legislator_names = legislators_by_zipcode(zipcode)
 
   form_letter = erb_template.result(binding)
 
   save_thank_you_letter(id, form_letter)
 end
+
+# Sort hours by occurence
+reg_time_distribution = reg_time.reduce(Hash.new(0)) do |acc, hour|
+  acc[hour] += 1
+  acc
+end.sort_by { |_key, value| value }.reverse.map { |key, _value| key }
+puts "The most common registartion hours were #{reg_time_distribution.first(3).join(', ')}"
