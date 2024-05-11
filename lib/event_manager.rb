@@ -46,6 +46,7 @@ def clean_zipcode(zipcode)
 end
 
 reg_time = []
+reg_date = []
 
 puts 'Event Manager Initialized!'
 
@@ -61,6 +62,7 @@ contents.each do |row|
   phone_number = clean_phone_number(row[:homephone])
 
   reg_time.push(Time.strptime(row[:regdate], '%m/%d/%y %H:%M').hour) unless row[:regdate].nil?
+  reg_date.push(Date.strptime(row[:regdate], '%m/%d/%y %H:%M').wday) unless row[:regdate].nil?
 
   legislator_names = legislators_by_zipcode(zipcode)
 
@@ -75,3 +77,28 @@ reg_time_distribution = reg_time.reduce(Hash.new(0)) do |acc, hour|
   acc
 end.sort_by { |_key, value| value }.reverse.map { |key, _value| key }
 puts "The most common registartion hours were #{reg_time_distribution.first(3).join(', ')}"
+
+# Sort days by occurance
+reg_date_distribution = reg_date.reduce(Hash.new(0)) do |acc, hour|
+  acc[hour] += 1
+  acc
+end.sort_by { |_key, value| value }
+reg_date_first_3 = reg_date_distribution.reverse.map { |key, _value| key }.first(3).map do |day|
+    case day
+    when 0
+      'Monday'
+    when 1
+      'Tuesday'
+    when 2
+      'Wednesday'
+    when 3
+      'Thursday'
+    when 4
+      'Friday'
+    when 5
+      'Saturday'
+    when 6
+      'Sunday'
+    end
+  end.join(', ')
+puts "The most common registartion days were #{reg_date_first_3}"
